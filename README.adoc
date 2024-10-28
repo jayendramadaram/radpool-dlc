@@ -1,0 +1,18 @@
+== Radpool DLC Contracts
+
+Radpool MSPs pay miners using a DLC contracts. The details are
+documented on https://pool2win.github.io/radpool-design/1/index.html
+and https://radpool.xyz.
+
+This repository is the Rust implementation of the contracts and hosts
+all detailed design decisions.
+
+The first design decision is to figure how we capture the contract
+terms - hashrate, btc and expiry.
+
+Then we need provide a crate with APIs where the miner and MSP pubkeys
+are provided as input. The API will return the Contract Execution
+Transactions for the two parties.
+
+Finally, we have a second API where the CETs are settled when the
+Oracle (Syndicate) is available.
