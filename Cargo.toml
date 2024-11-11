@@ -6,13 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 
-[profile.release]
-lto = "thin"
-codegen-units = 1
-
-
-
-
 [dependencies]
 dlc = { git = "https://github.com/p2pderivatives/rust-dlc" , features = ["use-serde"] }
 bitcoin-rpc-provider = { git = "https://github.com/p2pderivatives/rust-dlc" }
