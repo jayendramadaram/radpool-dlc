@@ -1,0 +1,6 @@
+[net]
+git-fetch-with-cli = true
+
+[build]
+jobs = 8
+incremental = true
