@@ -1289,6 +1289,7 @@ dependencies = [
  "dlc-manager",
  "dlc-messages",
  "dlc-sled-storage-provider",
+ "dlc-trie",
  "futures",
  "lightning",
  "lightning-net-tokio",

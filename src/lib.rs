@@ -1,3 +1,5 @@
+pub mod contract;
+
 #[allow(dead_code)]
 fn main() {
     println!("Hello, Radpool!");

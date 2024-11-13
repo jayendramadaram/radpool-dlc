@@ -12,6 +12,7 @@ bitcoin-rpc-provider = { git = "https://github.com/p2pderivatives/rust-dlc" }
 dlc-manager = { git = "https://github.com/p2pderivatives/rust-dlc"  , features = ["use-serde", "parallel"]}
 dlc-messages = { git = "https://github.com/p2pderivatives/rust-dlc" }
 dlc-sled-storage-provider = { git = "https://github.com/p2pderivatives/rust-dlc" }
+dlc-trie = { git = "https://github.com/p2pderivatives/rust-dlc" }
 p2pd-oracle-client = { git = "https://github.com/p2pderivatives/rust-dlc" }
 
 tokio = {version = "1.5", features = ["io-util", "macros", "rt", "rt-multi-thread", "sync", "net", "time"]}

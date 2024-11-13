@@ -93,7 +93,7 @@ impl Party {
         .await
         .unwrap();
 
-        println!("Offer created for {}! by {}", counter_party , self.user);
+        println!("Offer created for {}! by {}", counter_party, self.user);
 
         msg
     }
@@ -125,7 +125,7 @@ impl Party {
             fs::write(&offer_json_path, offer_str).unwrap();
         }
 
-        println!("Offer Stored for {}! by {}", counter_party , self.user);
+        println!("Offer Stored for {}! by {}", counter_party, self.user);
 
         // accept offer
         let (_, _, msg) = {
@@ -134,7 +134,10 @@ impl Party {
                 .expect("Error accepting offer")
         };
 
-        println!("Offer Accepted {:?} from {} by {}", offer_id, offer.counter_party , self.user);
+        println!(
+            "Offer Accepted {:?} from {} by {}",
+            offer_id, offer.counter_party, self.user
+        );
 
         msg
     }
