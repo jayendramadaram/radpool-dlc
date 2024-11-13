@@ -6,11 +6,14 @@ use dlc_manager::contract::{
 
 use super::errors::{ContractError, ContractResult};
 
+/// Builder for `ContractInput`
 pub struct ContractBuilder {
     contract: ContractInput,
 }
 
+
 impl ContractBuilder {
+    /// Returns a new `ContractBuilder` with default values.
     pub fn new() -> Self {
         ContractBuilder {
             contract: ContractInput {
@@ -53,9 +56,7 @@ impl ContractBuilder {
         }
 
         if threshold > public_keys.len() as u16 || threshold == 0 {
-            return Err(ContractError::InvalidThreshold(format!(
-                "Threshold is out of range or is zero"
-            )));
+            return Err(ContractError::InvalidThreshold);
         }
 
         Ok(ContractInputInfo {
@@ -101,8 +102,10 @@ mod tests {
 
     fn create_test_numerical_descriptor() -> ContractDescriptor {
         let descriptor = NumericalDescriptorBuilder::new()
-            .add_payout_point(100, 200, 2)
-            .add_payout_point(200, 300, 2)
+            .add_payout_point(1, 100, 200, 2)
+            .add_payout_point(1, 200, 300, 2)
+            .add_payout_point(2, 200, 300, 2)
+            .add_payout_point(2, 300, 400, 2)
             .add_rounding_interval(0, 10)
             .set_difference_params(5, 3, true)
             .set_oracle_numeric_info(10, vec![2, 3])
@@ -181,7 +184,7 @@ mod tests {
             .accept_collateral(5000)
             .build();
         assert!(contract.is_err());
-        assert_eq!(contract.unwrap_err(), ContractError::MissingContractInfo);
+        matches!(contract.unwrap_err(), ContractError::MissingContractInfo);
     }
 
     #[test]
@@ -193,7 +196,10 @@ mod tests {
             1,
         );
         assert!(contract_info.is_err());
-        assert_eq!(contract_info.unwrap_err(), ContractError::MissingOracles);
+        assert!(matches!(
+            contract_info.unwrap_err(),
+            ContractError::MissingOracles
+        ));
     }
 
     #[test]
@@ -205,9 +211,9 @@ mod tests {
             0,
         );
         assert!(contract_info.is_err());
-        assert_eq!(
+        assert!(matches!(
             contract_info.unwrap_err(),
-            ContractError::InvalidThreshold("Threshold is out of range or is zero".to_string())
-        );
+            ContractError::InvalidThreshold
+        ));
     }
 }

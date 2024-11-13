@@ -1,6 +1,11 @@
+use std::str::FromStr;
+
+use dlc::secp256k1_zkp::XOnlyPublicKey;
 use dlc_manager::contract::contract_input::ContractInput;
 use party::party::Party;
-use party::utils::{cleanup, must_load_contract};
+use party::utils::cleanup;
+use radpool_dlc::contract::contract_builder::ContractBuilder;
+use radpool_dlc::contract::descriptor_builder::NumericalDescriptorBuilder;
 
 mod party;
 
@@ -15,9 +20,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Party::new("bob".to_string()).await,
     );
 
-    // Read contract input
-    let contract_path = "./examples/contracts/numeric_outcome.json";
-    let contract_input: ContractInput = must_load_contract(contract_path);
+    // Read contract input, Built contract should match contract from ./examples/contracts/numeric_outcome.json
+    let contract_input: ContractInput = build_contract_with_defaults();
 
     // bob creates offer
     let offer = bob.create_order(contract_input, alice.pubkey).await;
@@ -60,4 +64,45 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // Ok(())
+}
+
+fn build_contract_with_defaults() -> ContractInput {
+    let pubkey = XOnlyPublicKey::from_str(
+        "0d829c1cc556aa59060df5a9543c5357199ace5db9bcd5a8ddd6ee2fc7b6d174",
+    )
+    .unwrap();
+    let current_unix_time = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+
+    let descriptor_with_payouts = NumericalDescriptorBuilder::new()
+        .add_payout_point(1, 0, 0, 0)
+        .add_payout_point(1, 50000, 0, 0)
+        .add_payout_point(2, 50000, 0, 0)
+        .add_payout_point(2, 60000, 200000000, 0)
+        .add_payout_point(3, 60000, 200000000, 0)
+        .add_payout_point(3, 1048575, 200000000, 0);
+
+    let descriptor = descriptor_with_payouts
+        .add_rounding_interval(0, 1)
+        .set_oracle_numeric_info(2, vec![20])
+        .build()
+        .unwrap();
+
+    let contract_info = ContractBuilder::create_contract_info(
+        dlc_manager::contract::ContractDescriptor::Numerical(descriptor),
+        vec![pubkey],
+        format!("btcusd{}", current_unix_time),
+        1,
+    );
+
+    let contract = ContractBuilder::new()
+        .fee_rate(2)
+        .offer_collateral(100000000)
+        .accept_collateral(100000000)
+        .with_contract_info(contract_info.unwrap())
+        .build();
+
+    contract.unwrap()
 }

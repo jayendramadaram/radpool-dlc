@@ -1,17 +1,22 @@
+use dlc_manager::error::Error as DlcManagerError;
 use std::fmt;
 
-#[derive(Debug, PartialEq)] 
+#[derive(Debug)]
 pub enum ContractError {
     // contract errors
     MissingContractInfo,
     MissingOracles,
-    InvalidThreshold(String),
-    
+    InvalidThreshold,
+
     // descriptor errors
     MissingOutcomePayouts,
     MissingOracleNumericInfo,
-    InvalidPayoutPoints(String),
-    InvalidRoundingInterval(String),
+    InvalidPayoutPoints,
+    InvalidRoundingInterval,
+    InvalidPayoutFunctionPieceSequence,
+
+    // Wrapped error from dlc-manager crate
+    DlcManagerError(DlcManagerError),
 }
 
 impl std::error::Error for ContractError {}
@@ -19,36 +24,47 @@ impl std::error::Error for ContractError {}
 impl fmt::Display for ContractError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ContractError::MissingContractInfo => {
+            Self::MissingContractInfo => {
                 write!(f, "At least one contract info is required")
             }
 
-            ContractError::MissingOracles => {
+            Self::MissingOracles => {
                 write!(f, "At least one oracle is required")
             }
-            
-            ContractError::InvalidThreshold(msg) => {
-                write!(f, "Invalid threshold value: {}", msg)
+
+            Self::InvalidThreshold => {
+                write!(f, "Threshold is out of range or is zero")
             }
 
-            ContractError::MissingOutcomePayouts => {
+            Self::MissingOutcomePayouts => {
                 write!(f, "At least one outcome payout is required")
             }
 
-            ContractError::MissingOracleNumericInfo => {
+            Self::MissingOracleNumericInfo => {
                 write!(f, "oracle numeric info is required")
             }
 
-            ContractError::InvalidPayoutPoints(msg) => {
-                write!(f, "Invalid payout points: {}", msg)
+            Self::InvalidPayoutPoints => {
+                write!(f, "at most more than one payout point is required")
             }
 
-            ContractError::InvalidRoundingInterval(msg) => {
-                write!(f, "Invalid rounding interval: {}", msg)
+            Self::InvalidRoundingInterval => {
+                write!(f, "at least one rounding interval is required")
             }
+
+            Self::InvalidPayoutFunctionPieceSequence => {
+                write!(f, "Invalid payout function piece sequence")
+            }
+
+            Self::DlcManagerError(e) => e.fmt(f),
         }
     }
 }
 
+impl From<DlcManagerError> for ContractError {
+    fn from(error: DlcManagerError) -> Self {
+        Self::DlcManagerError(error)
+    }
+}
 
 pub type ContractResult<T> = Result<T, ContractError>;

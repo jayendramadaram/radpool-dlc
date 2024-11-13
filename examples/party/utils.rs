@@ -1,5 +1,5 @@
 use dlc::secp256k1_zkp::XOnlyPublicKey;
-use dlc_manager::{contract::contract_input::ContractInput, Oracle};
+use dlc_manager::Oracle;
 use p2pd_oracle_client::P2PDOracleClient;
 use std::fmt::Write;
 use std::{collections::HashMap, fs, path::Path, sync::Arc};
@@ -67,10 +67,4 @@ pub fn dlc_dir_path(wallet: &str) -> String {
 /// Removes the `./temp` directory, used for persisting DLC-related data to disk.
 pub fn cleanup() {
     let _ = fs::remove_dir_all("./temp");
-}
-
-/// Loads a contract from a JSON file.
-pub fn must_load_contract(contract_path: &str) -> ContractInput {
-    let contract_input_str = fs::read_to_string(contract_path).unwrap();
-    serde_json::from_str(&contract_input_str).unwrap()
 }
