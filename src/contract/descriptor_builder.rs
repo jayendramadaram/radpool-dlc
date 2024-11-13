@@ -1,11 +1,7 @@
 use std::collections::HashMap;
 
-use dlc::{EnumerationPayout, Payout};
 use dlc_manager::{
-    contract::{
-        enum_descriptor::EnumDescriptor,
-        numerical_descriptor::{DifferenceParams, NumericalDescriptor},
-    },
+    contract::numerical_descriptor::{DifferenceParams, NumericalDescriptor},
     payout_curve::{
         PayoutFunction, PayoutFunctionPiece, PayoutPoint, PolynomialPayoutCurvePiece,
         RoundingInterval, RoundingIntervals,
