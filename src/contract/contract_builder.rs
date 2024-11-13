@@ -53,8 +53,9 @@ impl ContractBuilder {
     ) -> ContractResult<ContractInputInfo> {
         if public_keys.is_empty() {
             return Err(ContractError::MissingOracles);
-        }
+        }  
 
+        // pubkeys would always be in range of u16
         if threshold > public_keys.len() as u16 || threshold == 0 {
             return Err(ContractError::InvalidThreshold);
         }
@@ -79,7 +80,7 @@ impl ContractBuilder {
 
 #[cfg(test)]
 mod tests {
-    use crate::contract::descriptor_builder::{EnumDescriptorBuilder, NumericalDescriptorBuilder};
+    use crate::contract::descriptor_builder::NumericalDescriptorBuilder;
 
     use super::*;
 
@@ -92,13 +93,6 @@ mod tests {
         pubkey
     }
 
-    fn create_test_enum_descriptor() -> ContractDescriptor {
-        let enum_descriptor = EnumDescriptorBuilder::new()
-            .add_payout("win".to_string(), 100, 200)
-            .build()
-            .unwrap();
-        ContractDescriptor::Enum(enum_descriptor)
-    }
 
     fn create_test_numerical_descriptor() -> ContractDescriptor {
         let descriptor = NumericalDescriptorBuilder::new()
@@ -118,7 +112,7 @@ mod tests {
     fn test_contract_builder_success() {
         let pubkey = create_test_xonly_pubkey();
         let contract_info = ContractBuilder::create_contract_info(
-            create_test_enum_descriptor(),
+            create_test_numerical_descriptor(),
             vec![pubkey],
             "btcusd1731397577".to_string(),
             1,
@@ -146,7 +140,7 @@ mod tests {
     fn test_contract_builder_multiple_infos() {
         let pubkey = create_test_xonly_pubkey();
         let contract_info1 = ContractBuilder::create_contract_info(
-            create_test_enum_descriptor(),
+            create_test_numerical_descriptor(),
             vec![pubkey],
             "btcusd1731397577".to_string(),
             1,
@@ -190,7 +184,7 @@ mod tests {
     #[test]
     fn test_contract_builder_missing_oracles() {
         let contract_info = ContractBuilder::create_contract_info(
-            create_test_enum_descriptor(),
+            create_test_numerical_descriptor(),
             vec![],
             "btcusd1731397577".to_string(),
             1,
@@ -205,7 +199,7 @@ mod tests {
     #[test]
     fn test_contract_builder_invalid_threshold() {
         let contract_info = ContractBuilder::create_contract_info(
-            create_test_enum_descriptor(),
+            create_test_numerical_descriptor(),
             vec![create_test_xonly_pubkey()],
             "btcusd1731397577".to_string(),
             0,

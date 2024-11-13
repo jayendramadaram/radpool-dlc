@@ -16,37 +16,6 @@ use dlc_trie::OracleNumericInfo;
 use super::errors::{ContractError, ContractResult};
 
 #[derive(Default)]
-/// Builder for `EnumDescriptor`
-pub struct EnumDescriptorBuilder {
-    outcome_payouts: Vec<EnumerationPayout>,
-}
-
-impl EnumDescriptorBuilder {
-    /// Returns a new `EnumDescriptorBuilder` with default values.
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn add_payout(mut self, outcome: String, offer: u64, accept: u64) -> Self {
-        let enum_payout = EnumerationPayout {
-            outcome,
-            payout: Payout { offer, accept },
-        };
-        self.outcome_payouts.push(enum_payout);
-        self
-    }
-
-    pub fn build(self) -> ContractResult<EnumDescriptor> {
-        if self.outcome_payouts.is_empty() {
-            return Err(ContractError::MissingOutcomePayouts);
-        }
-        Ok(EnumDescriptor {
-            outcome_payouts: self.outcome_payouts,
-        })
-    }
-}
-
-#[derive(Default)]
 #[must_use]
 /// Builder for `NumericalDescriptor`
 pub struct NumericalDescriptorBuilder {
@@ -152,38 +121,6 @@ impl NumericalDescriptorBuilder {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_enum_descriptor_builder_success() {
-        let descriptor = EnumDescriptorBuilder::new()
-            .add_payout("win".to_string(), 300, 0)
-            .add_payout("lose".to_string(), 0, 300)
-            .build();
-
-        assert!(descriptor.is_ok());
-        let descriptor = descriptor.unwrap();
-        assert_eq!(descriptor.outcome_payouts.len(), 2);
-
-        let first_payout = &descriptor.outcome_payouts[0];
-        assert_eq!(first_payout.outcome, "win");
-        assert_eq!(first_payout.payout.offer, 300);
-        assert_eq!(first_payout.payout.accept, 0);
-
-        let second_payout = &descriptor.outcome_payouts[1];
-        assert_eq!(second_payout.outcome, "lose");
-        assert_eq!(second_payout.payout.offer, 0);
-        assert_eq!(second_payout.payout.accept, 300);
-    }
-
-    #[test]
-    fn test_enum_descriptor_builder_empty_error() {
-        let descriptor = EnumDescriptorBuilder::new().build();
-        assert!(descriptor.is_err());
-        assert!(matches!(
-            descriptor.unwrap_err(),
-            ContractError::MissingOutcomePayouts
-        ));
-    }
 
     #[test]
     fn test_numerical_descriptor_builder_success() {
