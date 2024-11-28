@@ -2,6 +2,7 @@
 services:
   ### BITCOIND
   bitcoind:
+    # using polarlightning/bitcoind, since rust-dlc dependency uses it aswell.
     image: polarlightning/bitcoind:27.0
     container_name: bitcoin-node
     command: |

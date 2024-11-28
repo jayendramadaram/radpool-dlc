@@ -177,6 +177,9 @@ impl Party {
     }
 
     /// Derives the maturity epoch for a signed contract.
+    /// 
+    /// Maturity is not defined by Miner or Msp, rather syndicate publishes attestions at regular intervals of time. 
+    /// This function derives maturity epoch from the latest signed contract.
     pub fn derive_maturity(&self) -> u64 {
         let dlc_mngr_clone = self.dlc_manager.clone();
         let dlc_mngr_locked = dlc_mngr_clone.lock().unwrap();
@@ -263,7 +266,7 @@ pub async fn setup_dlc_manager(wallet: &str) -> DlcManager {
     let bitcoind_provider = bitcoin_provider_with_defaults(wallet);
     let oracles = oracles().await;
 
-    let dlc_managerr = Arc::new(Mutex::new(
+    let dlc_manager = Arc::new(Mutex::new(
         dlc_manager::manager::Manager::new(
             bitcoind_provider.clone(),
             bitcoind_provider.clone(),
@@ -279,7 +282,7 @@ pub async fn setup_dlc_manager(wallet: &str) -> DlcManager {
         .expect("Could not create manager."),
     ));
 
-    dlc_managerr
+    dlc_manager
 }
 
 /// set up key manager

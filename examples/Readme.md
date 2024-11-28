@@ -44,7 +44,7 @@ The main.rs example demonstrates the following DLC execution flow:
 
 - Setup the parties (Alice and Bob) with their respective DlcManager and KeysManager.
 - Read the contract input from a JSON file.
-- Create an offer for the contract and send it to Alice.
+- Bob creates an offer for the contract and send it to Alice.
 - Process the offer on Alice's side and accept the contract.
 - Handle the response from Bob and complete the contract signing.
 - Monitor the contract maturity and process the settlement.

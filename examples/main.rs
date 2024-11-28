@@ -1,5 +1,5 @@
 use std::str::FromStr;
-
+use tokio::time::{interval, Duration};
 use dlc::secp256k1_zkp::XOnlyPublicKey;
 use dlc_manager::contract::contract_input::ContractInput;
 use party::party::Party;
@@ -38,7 +38,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     print!("Funding Tx Broadcasted, please mine 10 blocks to get it confirmed\n");
     let mut required_maturity: u64 = 0;
 
+    let mut interval = interval(Duration::from_secs(5));
+
     loop {
+        // Synchronize with the interval
+        interval.tick().await;
+
         if required_maturity == 0 {
             let maturity = alice.derive_maturity();
             if maturity == 0 {
@@ -58,9 +63,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             );
         }
 
-        bob.process_contracts().await;
-        alice.process_contracts().await;
-        tokio::time::sleep(std::time::Duration::from_millis(5000)).await;
+        // Process contracts in parallel
+        tokio::join!(
+            bob.process_contracts(),
+            alice.process_contracts()
+        );
     }
 
     // Ok(())
@@ -74,7 +81,7 @@ fn build_contract_with_defaults() -> ContractInput {
     let current_unix_time = std::time::SystemTime::now()
         .duration_since(std::time::UNIX_EPOCH)
         .unwrap()
-        .as_secs();
+        .as_secs() + 120;
 
     let descriptor_with_payouts = NumericalDescriptorBuilder::new()
         .add_payout_point(1, 0, 0, 0)
